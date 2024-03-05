@@ -5,6 +5,12 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 from PIL import Image
+import yaml
+
+def load_class_mapping(yaml_file):
+    with open(yaml_file, 'r') as file:
+        yaml_content = yaml.safe_load(file)
+    return {str(cls): idx for idx, cls in enumerate(yaml_content['classes'])}
 
 # Define transformations
 transform = transforms.Compose([
@@ -15,18 +21,20 @@ transform = transforms.Compose([
 
 # Custom dataset for training
 class CustomTrainDataset(Dataset):
-    def __init__(self, annotations_file, img_dir, transform=None):
+    def __init__(self, annotations_file, img_dir, class_yaml, transform=None):
         self.img_labels = [line.strip().split(',') for line in open(annotations_file)]
         self.img_dir = img_dir
         self.transform = transform
+        self.label_to_index = load_class_mapping(class_yaml) 
 
     def __len__(self):
         return len(self.img_labels)
 
     def __getitem__(self, idx):
-        img_path = os.path.join(self.img_dir, self.img_labels[idx][0])
+        img_path, label_str = self.img_labels[idx]
+        img_path = os.path.join(self.img_dir, img_path)
         image = Image.open(img_path).convert('RGB')
-        label = int(self.img_labels[idx][1])
+        label = self.label_to_index[label_str]
         if self.transform:
             image = self.transform(image)
         return image, label
@@ -51,7 +59,8 @@ class CustomTestDataset(Dataset):
 # Initialize datasets and loaders
 train_dataset = CustomTrainDataset(
     annotations_file=os.path.expanduser('~/downloads/bev_classification/datasets/train.txt'),
-    img_dir=os.path.expanduser('~/downloads/bev_classification/images/'),
+    img_dir=os.path.expanduser('~/downloads/bev_classification/'),
+    class_yaml=os.path.expanduser('~/downloads/bev_classification/names.yaml'),
     transform=transform
 )
 
@@ -59,7 +68,7 @@ train_loader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
 
 test_dataset = CustomTestDataset(
     annotations_file=os.path.expanduser('~/downloads/bev_classification/datasets/test_edited.txt'),
-    img_dir=os.path.expanduser('~/downloads/bev_classification/images/'),
+    img_dir=os.path.expanduser('~/downloads/bev_classification/'),
     transform=transform
 )
 
