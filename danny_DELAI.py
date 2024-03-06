@@ -1,5 +1,6 @@
 import torch
 from torchvision import transforms, models
+from torchvision.models.efficientnet import EfficientNet_B0_Weights
 from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
@@ -75,7 +76,7 @@ test_dataset = CustomTestDataset(
 test_loader = DataLoader(dataset=test_dataset, batch_size=32, shuffle=False)
 
 # Initialize the model
-model = models.efficientnet_b0(pretrained=True)
+model = models.efficientnet_b0(weights=EfficientNet_B0_Weights.DEFAULT)
 
 # Update the number of classes in the classifier
 num_classes = 99  # Update this number based on your dataset
