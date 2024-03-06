@@ -59,17 +59,17 @@ class CustomTestDataset(Dataset):
 
 # Initialize datasets and loaders
 train_dataset = CustomTrainDataset(
-    annotations_file=os.path.expanduser('~/downloads/bev_classification/datasets/train.txt'),
-    img_dir=os.path.expanduser('~/downloads/bev_classification/'),
-    class_yaml=os.path.expanduser('~/downloads/bev_classification/names.yaml'),
+    annotations_file=os.path.expanduser('~\\downloads\\bev_classification\\datasets\\train.txt'),
+    img_dir=os.path.expanduser('~\\downloads\\bev_classification\\'),
+    class_yaml=os.path.expanduser('~\\downloads\\bev_classification\\names.yaml'),
     transform=transform
 )
 
 train_loader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
 
 test_dataset = CustomTestDataset(
-    annotations_file=os.path.expanduser('~/downloads/bev_classification/datasets/test_edited.txt'),
-    img_dir=os.path.expanduser('~/downloads/bev_classification/'),
+    annotations_file=os.path.expanduser('~\\downloads\\bev_classification\\datasets\\test_edited.txt'),
+    img_dir=os.path.expanduser('~\\downloads\\bev_classification\\'),
     transform=transform
 )
 
@@ -90,9 +90,22 @@ model.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
+# Define the checkpoint file path
+checkpoint_dir = os.getcwd()
+checkpoint_path = os.path.join(checkpoint_dir, 'model_checkpoint.pth')
+
+# Load saved checkpoints
+if os.path.exists(checkpoint_path):
+    checkpoint = torch.load(checkpoint_path)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    start_epoch = checkpoint['epoch'] + 1
+else:
+    start_epoch = 0
+
 # Training loop
 num_epochs = 10
-for epoch in range(num_epochs):
+for epoch in range(start_epoch, num_epochs):
     model.train()
     running_loss = 0.0
     for inputs, labels in train_loader:
@@ -106,6 +119,11 @@ for epoch in range(num_epochs):
         running_loss += loss.item()
 
     print(f'Epoch {epoch+1}, Loss: {running_loss/len(train_loader)}')
+    torch.save({
+    'epoch': epoch,
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    }, checkpoint_path)
 
 # Prediction generation after training
 model.eval()  # Set the model to evaluation mode
