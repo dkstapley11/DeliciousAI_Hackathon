@@ -59,7 +59,7 @@ def main():
     model = models.efficientnet_b0(weights=EfficientNet_B0_Weights.DEFAULT)
 
     # Update the number of classes in the classifier, if your dataset doesn't have 1000 classes
-    num_classes = 99  # Update this based on your dataset
+    num_classes = 99
     model.classifier[1] = torch.nn.Linear(model.classifier[1].in_features, num_classes)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -71,7 +71,7 @@ def main():
     model.load_state_dict(checkpoint['model_state_dict'])
 
     with torch.no_grad():
-        for images, paths in test_loader:  # Now we also get paths
+        for images, paths in test_loader:
             images = images.to(device)
             outputs = model(images)
 

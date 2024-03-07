@@ -116,7 +116,7 @@ class CustomTestDataset(Dataset):
         return image, self.img_paths[idx] 
 ```
 
-- **Initialize Necessary Variables** - Once I loaded in the datasets, it was time to load in the CNN model and make other miscellaneous preparations. I ended up sticking with EfficientNet_B0, as planned. The default number of classes
+- **Initialize Necessary Variables** - Once I loaded in the datasets, it was time to load in the CNN model and make other miscellaneous preparations. I ended up sticking with `EfficientNet_B0`, as planned. The default number of classes in EfficientNet's classifier is 1000, and we only had 99, so I manually set `num_classes` to 99. Then, I added a couple lines that would move the model to run on the GPU if a `cuda` compatible GPU was available. I added this later after having trouble training the model on my laptop. Using the GPU in my desktop was approximately 5x faster than my local CPU. Lastly, I defined the loss and optimizer funcions, with a standard learning rate `lr` of 0.001.
 ```python
 # Initialize the model
 model = models.efficientnet_b0(weights=EfficientNet_B0_Weights.DEFAULT)
@@ -133,3 +133,20 @@ model.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 ```
+
+- **Save Functionality** - After experiencing an unexpected interruption to the program halfway through training, I took the time to add a save function. If the training process was interrupted, the model's progress (current epoch, the model's state, and the optimizer's state) would be preserved in a large binary file called `model_checkpoint.pth`. This code configures the program to run from a saved state, if there is one avaliable. Else, it will start from scratch. 
+```python
+# Define the checkpoint file path
+checkpoint_dir = os.getcwd()
+checkpoint_path = os.path.join(checkpoint_dir, 'model_checkpoint.pth')
+
+# Load saved checkpoints
+if os.path.exists(checkpoint_path):
+    checkpoint = torch.load(checkpoint_path)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    start_epoch = checkpoint['epoch'] + 1
+else:
+    start_epoch = 0
+```
+
