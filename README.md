@@ -74,6 +74,7 @@ with torch.no_grad():
 
 
 # Process/Implementation - Danny
+Everything not included or explained in the above project plan, I will explain in detail in this section. As with any project, I stuck to the plan and made adjustments along the way.
 
 - **Create Custom Datasets** - Inheriting from the Dataset class in the PyTorch library, I made two subclasses: CustomTrainDataset and CustomTestDataset. I did this because we were going to be treating our training and testing datasets differently. Furthermore, the training data was given in a text file as paths to each image from the `/images` directory, followed by its associated class. The testing data was just a path to each image.
 ```python
@@ -113,4 +114,22 @@ class CustomTestDataset(Dataset):
         if self.transform:
             image = self.transform(image)
         return image, self.img_paths[idx] 
+```
+
+- **Initialize Necessary Variables** - Once I loaded in the datasets, it was time to load in the CNN model and make other miscellaneous preparations. I ended up sticking with EfficientNet_B0, as planned. The default number of classes
+```python
+# Initialize the model
+model = models.efficientnet_b0(weights=EfficientNet_B0_Weights.DEFAULT)
+
+# Update the number of classes in the classifier
+num_classes = 99
+model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
+
+# Move model to GPU if available
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+model.to(device)
+
+# Loss and optimizer
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 ```
