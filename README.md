@@ -76,6 +76,16 @@ with torch.no_grad():
 # Process/Implementation - Danny
 Everything not included or explained in the above project plan, I will explain in detail in this section. As with any project, I stuck to the plan and made adjustments along the way.
 
+- **Prepare The Data** - To start, I had to define a function that would normalize the sizes of all of the images. I decided to make the images 224x224.
+```python
+# Define transformations
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
+```
+
 - **Create Custom Datasets** - Inheriting from the Dataset class in the PyTorch library, I made two subclasses: CustomTrainDataset and CustomTestDataset. I did this because we were going to be treating our training and testing datasets differently. Furthermore, the training data was given in a text file as paths to each image from the `/images` directory, followed by its associated class. The testing data was just a path to each image.
 ```python
 # Custom dataset for training
@@ -148,5 +158,61 @@ if os.path.exists(checkpoint_path):
     start_epoch = checkpoint['epoch'] + 1
 else:
     start_epoch = 0
+```
+
+- **Run The Training Loop** - At this point, the model has everything it needs to begin learning on the training dataset. This loop goes through all of the 88,794 images ten times. Each loop, running loss got smaller, indicating that the model was learning. I chose 10 epochs, a relatively standard choice, to try and maximize accuracy without overfitting. At the end of each loop, progress is saved. With limited computing resources, training took approximately 10 hours. 
+```python
+# Training loop
+num_epochs = 10
+for epoch in range(start_epoch, num_epochs):
+    model.train()
+    running_loss = 0.0
+    for inputs, labels in train_loader:
+        inputs, labels = inputs.to(device), labels.to(device)
+
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+        running_loss += loss.item()
+
+    print(f'Epoch {epoch+1}, Loss: {running_loss/len(train_loader)}')
+    torch.save({
+    'epoch': epoch,
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    }, checkpoint_path)
+```
+
+- **Test The Trained Model** - After the model was trained, it was time to test it out on the testing dataset. I used the `torch.no_grad()` method because I didn't want the model to continually adjust the weights and run the risk of overfitting. This code snippet outputs the model's class predictions for each image in top-1 and top-5 scoring format in their own respective text files, per competition instructions. 
+```python
+with torch.no_grad():
+    for images, paths in test_loader:
+        images = images.to(device)
+        outputs = model(images)
+
+        _, top1_pred = outputs.topk(1, 1, True, True)
+        _, top5_pred = outputs.topk(5, 1, True, True)
+        
+        top1_pred = top1_pred.squeeze().tolist()
+        top5_pred = top5_pred.tolist()
+        
+        for i, path in enumerate(paths):
+        # Convert top-1 and top-5 indices to class names
+            top1_class_name = index_to_class[top1_pred[i] if type(top1_pred) is list else top1_pred]
+            top5_class_names = [index_to_class[idx] for idx in top5_pred[i]]
+        
+            predictions.append((path, top1_class_name, *top5_class_names))
+
+# Save the top-1 predictions with class names
+with open('formatted_top1_predictions.txt', 'w') as f:
+    for path, top1_class_name, *_ in predictions:
+        f.write(f'{path}, {top1_class_name}\n')
+
+# Save the top-5 predictions with class names
+with open('formatted_top5_predictions.txt', 'w') as f:
+    for path, _, *top5_class_names in predictions:
+        f.write(f'{path}, ' + ', '.join(top5_class_names) + '\n')
 ```
 

@@ -79,7 +79,7 @@ test_loader = DataLoader(dataset=test_dataset, batch_size=32, shuffle=False)
 model = models.efficientnet_b0(weights=EfficientNet_B0_Weights.DEFAULT)
 
 # Update the number of classes in the classifier
-num_classes = 99  # Update this number based on your dataset
+num_classes = 99
 model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
 
 # Move model to GPU if available
