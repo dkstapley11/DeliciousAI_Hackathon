@@ -2,10 +2,10 @@
 March 2024 Artificial Intelligence Association hackathon competition. (Group: Daniel Stapley, Kai Sandberg, Aaron Earl, Collin McGregor, Jonathan Utley)
 
 # Table of Contents
-- [Introduction](#project-background)
-- [process](#process/implementation-danny)
-- [results](#results)
-- [rank](#rank)
+- [Introduction and Background](#project-background)
+- [Process and Implementation](#processimplementation---danny)
+- [Results](#results)
+- [Rank](#rank)
 
 ## Project Background
 
@@ -239,10 +239,12 @@ with open('formatted_top5_predictions.txt', 'w') as f:
 
 ### Top-1 Scoring
 Computing the accuracy with `compute_accuracy.py`, as outputted in `Top1_Result.txt`:
+
 "Out of 9898 images, the correct class was predicted with 94.4938% accuracy"
 
 ### Top-5 Scoring
 Computing the accuracy with `compute_accuracy.py`, as outputted in `Top5_Result.txt`:
+
 "Out of 9898 images, 9817 (99.18%) images' classes were predicted accurately within 5 guesses. Out of all 9898:
 94.49% were predicted on the first try.
 3.30% were predicted on the second try.
@@ -252,6 +254,7 @@ Computing the accuracy with `compute_accuracy.py`, as outputted in `Top5_Result.
 0.82% were missed."
 
 Visualization of above data, generated using `matplotlib` in `compute_accuracy.py`
+
 ![Top 5 Plot](Figure_1.png)
 
 ### Rank
