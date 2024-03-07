@@ -1,0 +1,1 @@
+Out of 9898 images, the correct class was predicted with 94.4938% accuracy

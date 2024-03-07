@@ -1,0 +1,7 @@
+Out of 9898 images, 9817 (99.18%) images' classes were predicted accurately within 5 guesses. Out of all 9898:
+94.49% were predicted on the first try.
+3.30% were predicted on the second try.
+0.84% were predicted on the third try.
+0.33% were predicted on the fourth try.
+0.21% were predicted on the fifth try.
+0.82% were missed.
