@@ -1,6 +1,12 @@
 # DeliciousAI_Hackathon
 March 2024 Artificial Intelligence Association hackathon competition. (Group: Daniel Stapley, Kai Sandberg, Aaron Earl, Collin McGregor, Jonathan Utley)
 
+# Table of Contents
+- [Introduction](#project-background)
+- [process](#process/implementation-danny)
+- [results](#results)
+- [rank](#rank)
+
 ## Project Background
 
 ### What Delicious AI Does
