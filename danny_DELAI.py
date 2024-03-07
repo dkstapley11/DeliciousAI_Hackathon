@@ -55,7 +55,7 @@ class CustomTestDataset(Dataset):
         image = Image.open(img_path).convert('RGB')
         if self.transform:
             image = self.transform(image)
-        return image
+        return image, self.img_paths[idx] 
 
 # Initialize datasets and loaders
 train_dataset = CustomTrainDataset(
