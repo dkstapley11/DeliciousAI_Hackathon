@@ -76,7 +76,7 @@ with torch.no_grad():
 # Process/Implementation - Danny
 Everything not included or explained in the above project plan, I will explain in detail in this section. As with any project, I stuck to the plan and made adjustments along the way.
 
-- **Prepare The Data** - To start, I had to define a function that would normalize the sizes of all of the images. I decided to make the images 224x224.
+- **Prepare The Data** - To start, I had to define a function that would normalize the sizes of all of the images. I decided to make the images 224x224. I also had to load the classes from the provided names.yaml file.
 ```python
 # Define transformations
 transform = transforms.Compose([
@@ -84,6 +84,19 @@ transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
+
+def load_class_mapping(yaml_file):
+    with open(yaml_file, 'r') as file:
+        yaml_content = yaml.safe_load(file)
+    return {str(cls): idx for idx, cls in enumerate(yaml_content['classes'])}
+
+class_yaml=os.path.expanduser('~/downloads/bev_classification/names.yaml')
+
+def invert_mapping(mapping):
+    return {v: k for k, v in mapping.items()}
+
+class_mapping = load_class_mapping(class_yaml)
+index_to_class = invert_mapping(class_mapping)
 ```
 
 - **Create Custom Datasets** - Inheriting from the Dataset class in the PyTorch library, I made two subclasses: CustomTrainDataset and CustomTestDataset. I did this because we were going to be treating our training and testing datasets differently. Furthermore, the training data was given in a text file as paths to each image from the `/images` directory, followed by its associated class. The testing data was just a path to each image.
