@@ -229,3 +229,24 @@ with open('formatted_top5_predictions.txt', 'w') as f:
         f.write(f'{path}, ' + ', '.join(top5_class_names) + '\n')
 ```
 
+# Results
+
+### Top-1 Scoring
+Computing the accuracy with `compute_accuracy.py`, as outputted in `Top1_Result.txt`:
+"Out of 9898 images, the correct class was predicted with 94.4938% accuracy"
+
+### Top-5 Scoring
+Computing the accuracy with `compute_accuracy.py`, as outputted in `Top5_Result.txt`:
+"Out of 9898 images, 9817 (99.18%) images' classes were predicted accurately within 5 guesses. Out of all 9898:
+94.49% were predicted on the first try.
+3.30% were predicted on the second try.
+0.84% were predicted on the third try.
+0.33% were predicted on the fourth try.
+0.21% were predicted on the fifth try.
+0.82% were missed."
+
+Visualization of above data, generated using `matplotlib` in `compute_accuracy.py`
+![Top 5 Plot](Figure_1.png)
+
+### Rank
+Achieved the highest degree of accuracy at 94.49% for top 1 scoring, a full 10% higher than the next team at 84% accuracy. Achieved a notable accuracy of over 99% for top 5 scoring.
