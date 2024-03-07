@@ -73,3 +73,44 @@ with torch.no_grad():
 - **Adjust Hyperparameters** - If necessary, try adjusting hyperparameters (like learning rate, batch size) and consider data augmentation techniques to improve performance
 
 
+# Process/Implementation - Danny
+
+- **Create Custom Datasets** - Inheriting from the Dataset class in the PyTorch library, I made two subclasses: CustomTrainDataset and CustomTestDataset. I did this because we were going to be treating our training and testing datasets differently. Furthermore, the training data was given in a text file as paths to each image from the `/images` directory, followed by its associated class. The testing data was just a path to each image.
+```python
+# Custom dataset for training
+class CustomTrainDataset(Dataset):
+    def __init__(self, annotations_file, img_dir, class_yaml, transform=None):
+        self.img_labels = [line.strip().split(',') for line in open(annotations_file)]
+        self.img_dir = img_dir
+        self.transform = transform
+        self.label_to_index = load_class_mapping(class_yaml) 
+
+    def __len__(self):
+        return len(self.img_labels)
+
+    def __getitem__(self, idx):
+        img_path, label_str = self.img_labels[idx]
+        img_path = os.path.join(self.img_dir, img_path)
+        image = Image.open(img_path).convert('RGB')
+        label = self.label_to_index[label_str]
+        if self.transform:
+            image = self.transform(image)
+        return image, label
+
+# Custom dataset for testing
+class CustomTestDataset(Dataset):
+    def __init__(self, annotations_file, img_dir, transform=None):
+        self.img_paths = [line.strip() for line in open(annotations_file)]
+        self.img_dir = img_dir
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.img_paths)
+
+    def __getitem__(self, idx):
+        img_path = os.path.join(self.img_dir, self.img_paths[idx])
+        image = Image.open(img_path).convert('RGB')
+        if self.transform:
+            image = self.transform(image)
+        return image, self.img_paths[idx] 
+```
