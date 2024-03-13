@@ -2,8 +2,6 @@ import torch
 from torchvision import transforms, models
 from torchvision.models.efficientnet import EfficientNet_B0_Weights
 from torch.utils.data import Dataset, DataLoader
-import torch.nn as nn
-import torch.optim as optim
 import os
 from PIL import Image
 import yaml
